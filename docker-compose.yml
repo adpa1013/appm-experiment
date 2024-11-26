@@ -1,0 +1,18 @@
+services:
+  appointment-db:
+    image: postgres:latest
+    container_name: appointment-db
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_USER: "paul"
+      POSTGRES_PASSWORD: "Strong@Passw0rd"
+      POSTGRES_DB: "appointment_db"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+volumes:
+  postgres_data:
+    driver: local
+
+# postgresql://paul:Strong@Passw0rd@localhost:5432/appointment_db
