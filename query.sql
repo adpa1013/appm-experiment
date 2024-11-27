@@ -1,8 +1,18 @@
--- name: GetAppointmentsBySeries :many
-SELECT ap.kEdAppointmentId, ap.strName, ap.dtmBegin, ap.dtmEnd
-FROM tblEdAppointment ap
-WHERE ap.kEdAppointmentId IN (
-    SELECT aseries.kEdAppointmentId
-    FROM tblEdAppointmentSeries aseries
-    WHERE aseries.kEdAppointmentId = $1
-);
+-- name: GetAppointments :many
+
+SELECT *
+FROM appointment;
+
+-- name: InsertAppointment :exec
+
+INSERT INTO appointment (name, start_time, end_time)
+VALUES ($1,
+        $2,
+        $3);
+
+-- name: DeleteEverything :exec
+
+DELETE FROM appointment;
+DELETE FROM appointment_series;
+DELETE FROM excluded_from_series;
+

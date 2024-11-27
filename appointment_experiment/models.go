@@ -11,121 +11,123 @@ import (
 	"github.com/jackc/pgx/v5/pgtype"
 )
 
-type Month string
+type MonthEnum string
 
 const (
-	MonthJanuary   Month = "January"
-	MonthFebruary  Month = "February"
-	MonthMarch     Month = "March"
-	MonthApril     Month = "April"
-	MonthMay       Month = "May"
-	MonthJune      Month = "June"
-	MonthJuly      Month = "July"
-	MonthAugust    Month = "August"
-	MonthSeptember Month = "September"
-	MonthOctober   Month = "October"
-	MonthNovember  Month = "November"
-	MonthDecember  Month = "December"
+	MonthEnumJanuary   MonthEnum = "January"
+	MonthEnumFebruary  MonthEnum = "February"
+	MonthEnumMarch     MonthEnum = "March"
+	MonthEnumApril     MonthEnum = "April"
+	MonthEnumMay       MonthEnum = "May"
+	MonthEnumJune      MonthEnum = "June"
+	MonthEnumJuly      MonthEnum = "July"
+	MonthEnumAugust    MonthEnum = "August"
+	MonthEnumSeptember MonthEnum = "September"
+	MonthEnumOctober   MonthEnum = "October"
+	MonthEnumNovember  MonthEnum = "November"
+	MonthEnumDecember  MonthEnum = "December"
 )
 
-func (e *Month) Scan(src interface{}) error {
+func (e *MonthEnum) Scan(src interface{}) error {
 	switch s := src.(type) {
 	case []byte:
-		*e = Month(s)
+		*e = MonthEnum(s)
 	case string:
-		*e = Month(s)
+		*e = MonthEnum(s)
 	default:
-		return fmt.Errorf("unsupported scan type for Month: %T", src)
+		return fmt.Errorf("unsupported scan type for MonthEnum: %T", src)
 	}
 	return nil
 }
 
-type NullMonth struct {
-	Month Month
-	Valid bool // Valid is true if Month is not NULL
+type NullMonthEnum struct {
+	MonthEnum MonthEnum
+	Valid     bool // Valid is true if MonthEnum is not NULL
 }
 
 // Scan implements the Scanner interface.
-func (ns *NullMonth) Scan(value interface{}) error {
+func (ns *NullMonthEnum) Scan(value interface{}) error {
 	if value == nil {
-		ns.Month, ns.Valid = "", false
+		ns.MonthEnum, ns.Valid = "", false
 		return nil
 	}
 	ns.Valid = true
-	return ns.Month.Scan(value)
+	return ns.MonthEnum.Scan(value)
 }
 
 // Value implements the driver Valuer interface.
-func (ns NullMonth) Value() (driver.Value, error) {
+func (ns NullMonthEnum) Value() (driver.Value, error) {
 	if !ns.Valid {
 		return nil, nil
 	}
-	return string(ns.Month), nil
+	return string(ns.MonthEnum), nil
 }
 
-type Scheduletype string
+type ScheduleTypeEnum string
 
 const (
-	ScheduletypeDaily   Scheduletype = "Daily"
-	ScheduletypeWeekly  Scheduletype = "Weekly"
-	ScheduletypeMonthly Scheduletype = "Monthly"
-	ScheduletypeYearly  Scheduletype = "Yearly"
+	ScheduleTypeEnumDaily   ScheduleTypeEnum = "Daily"
+	ScheduleTypeEnumWeekly  ScheduleTypeEnum = "Weekly"
+	ScheduleTypeEnumMonthly ScheduleTypeEnum = "Monthly"
+	ScheduleTypeEnumYearly  ScheduleTypeEnum = "Yearly"
 )
 
-func (e *Scheduletype) Scan(src interface{}) error {
+func (e *ScheduleTypeEnum) Scan(src interface{}) error {
 	switch s := src.(type) {
 	case []byte:
-		*e = Scheduletype(s)
+		*e = ScheduleTypeEnum(s)
 	case string:
-		*e = Scheduletype(s)
+		*e = ScheduleTypeEnum(s)
 	default:
-		return fmt.Errorf("unsupported scan type for Scheduletype: %T", src)
+		return fmt.Errorf("unsupported scan type for ScheduleTypeEnum: %T", src)
 	}
 	return nil
 }
 
-type NullScheduletype struct {
-	Scheduletype Scheduletype
-	Valid        bool // Valid is true if Scheduletype is not NULL
+type NullScheduleTypeEnum struct {
+	ScheduleTypeEnum ScheduleTypeEnum
+	Valid            bool // Valid is true if ScheduleTypeEnum is not NULL
 }
 
 // Scan implements the Scanner interface.
-func (ns *NullScheduletype) Scan(value interface{}) error {
+func (ns *NullScheduleTypeEnum) Scan(value interface{}) error {
 	if value == nil {
-		ns.Scheduletype, ns.Valid = "", false
+		ns.ScheduleTypeEnum, ns.Valid = "", false
 		return nil
 	}
 	ns.Valid = true
-	return ns.Scheduletype.Scan(value)
+	return ns.ScheduleTypeEnum.Scan(value)
 }
 
 // Value implements the driver Valuer interface.
-func (ns NullScheduletype) Value() (driver.Value, error) {
+func (ns NullScheduleTypeEnum) Value() (driver.Value, error) {
 	if !ns.Valid {
 		return nil, nil
 	}
-	return string(ns.Scheduletype), nil
+	return string(ns.ScheduleTypeEnum), nil
 }
 
-type Tbledappointment struct {
-	Kedappointmentid int32
-	Strname          pgtype.Text
-	Dtmbegin         pgtype.Timestamp
-	Dtmend           pgtype.Timestamp
+type Appointment struct {
+	AppointmentID int32
+	Name          pgtype.Text
+	StartTime     pgtype.Timestamp
+	EndTime       pgtype.Timestamp
 }
 
-type Tbledappointmentseries struct {
-	Kedappointmentid int32
-	Escheduletype    Scheduletype
-	Dtmend           pgtype.Timestamp
-	Kdayweekschedule pgtype.Int2
-	Kmonthschedule   pgtype.Int4
-	Kyearschedule    pgtype.Int4
-	Emonthofyear     NullMonth
+type AppointmentSeries struct {
+	SeriesID        int32
+	AppointmentID   int32
+	ScheduleType    ScheduleTypeEnum
+	EndTime         pgtype.Timestamp
+	DayWeekSchedule pgtype.Int2
+	MonthSchedule   pgtype.Int4
+	YearSchedule    pgtype.Int4
+	MonthOfYear     NullMonthEnum
 }
 
-type Tblexcludedfromseries struct {
-	Kdecappointmentid int32
-	Kedappointmentid  int32
-	Dtmsrcseriesapmt  pgtype.Timestamp
+type ExcludedFromSeries struct {
+	ExcludedFromSeriesID        int32
+	AppointmentID               int32
+	DecAppointmentID            int32
+	SourceSeriesAppointmentTime pgtype.Timestamp
 }

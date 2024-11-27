@@ -7,32 +7,40 @@ package appointment_experiment
 
 import (
 	"context"
+
+	"github.com/jackc/pgx/v5/pgtype"
 )
 
-const getAppointmentsBySeries = `-- name: GetAppointmentsBySeries :many
-SELECT ap.kEdAppointmentId, ap.strName, ap.dtmBegin, ap.dtmEnd
-FROM tblEdAppointment ap
-WHERE ap.kEdAppointmentId IN (
-    SELECT aseries.kEdAppointmentId
-    FROM tblEdAppointmentSeries aseries
-    WHERE aseries.kEdAppointmentId = $1
-)
+const deleteEverything = `-- name: DeleteEverything :exec
+
+DELETE FROM appointment
 `
 
-func (q *Queries) GetAppointmentsBySeries(ctx context.Context, kedappointmentid int32) ([]Tbledappointment, error) {
-	rows, err := q.db.Query(ctx, getAppointmentsBySeries, kedappointmentid)
+func (q *Queries) DeleteEverything(ctx context.Context) error {
+	_, err := q.db.Exec(ctx, deleteEverything)
+	return err
+}
+
+const getAppointments = `-- name: GetAppointments :many
+
+SELECT appointment_id, name, start_time, end_time
+FROM appointment
+`
+
+func (q *Queries) GetAppointments(ctx context.Context) ([]Appointment, error) {
+	rows, err := q.db.Query(ctx, getAppointments)
 	if err != nil {
 		return nil, err
 	}
 	defer rows.Close()
-	var items []Tbledappointment
+	var items []Appointment
 	for rows.Next() {
-		var i Tbledappointment
+		var i Appointment
 		if err := rows.Scan(
-			&i.Kedappointmentid,
-			&i.Strname,
-			&i.Dtmbegin,
-			&i.Dtmend,
+			&i.AppointmentID,
+			&i.Name,
+			&i.StartTime,
+			&i.EndTime,
 		); err != nil {
 			return nil, err
 		}
@@ -42,4 +50,23 @@ func (q *Queries) GetAppointmentsBySeries(ctx context.Context, kedappointmentid 
 		return nil, err
 	}
 	return items, nil
+}
+
+const insertAppointment = `-- name: InsertAppointment :exec
+
+INSERT INTO appointment (name, start_time, end_time)
+VALUES ($1,
+        $2,
+        $3)
+`
+
+type InsertAppointmentParams struct {
+	Name      pgtype.Text
+	StartTime pgtype.Timestamp
+	EndTime   pgtype.Timestamp
+}
+
+func (q *Queries) InsertAppointment(ctx context.Context, arg InsertAppointmentParams) error {
+	_, err := q.db.Exec(ctx, insertAppointment, arg.Name, arg.StartTime, arg.EndTime)
+	return err
 }

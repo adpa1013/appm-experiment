@@ -1,4 +1,4 @@
-CREATE TYPE Month AS ENUM (
+CREATE TYPE month_enum AS ENUM (
   'January',
   'February',
   'March',
@@ -13,44 +13,46 @@ CREATE TYPE Month AS ENUM (
   'December'
 );
 
-CREATE TYPE ScheduleType AS ENUM (
+CREATE TYPE schedule_type_enum AS ENUM (
   'Daily',
   'Weekly',
   'Monthly',
   'Yearly'
 );
 
-CREATE TABLE tblEdAppointmentSeries (
-  kEdAppointmentId integer PRIMARY KEY,
-  eScheduleType ScheduleType NOT NULL,
-  dtmEnd timestamp,
-  kDayWeekSchedule smallint,
-  kMonthSchedule integer,
-  kYearSchedule integer,
-  eMonthOfYear Month
+CREATE TABLE appointment_series (
+  series_id SERIAL PRIMARY KEY,
+  appointment_id integer NOT NULL,
+  schedule_type schedule_type_enum NOT NULL,
+  end_time timestamp,
+  day_week_schedule smallint,
+  month_schedule integer,
+  year_schedule integer,
+  month_of_year month_enum
 );
 
-CREATE TABLE tblExcludedFromSeries (
-  kDecAppointmentId integer PRIMARY KEY,
-  kEdAppointmentId integer NOT NULL,
-  dtmSrcSeriesApmt timestamp
+CREATE TABLE excluded_from_series (
+  excluded_from_series_id SERIAL PRIMARY KEY,
+  appointment_id integer NOT NULL,
+  dec_appointment_id integer NOT NULL,
+  source_series_appointment_time timestamp
 );
 
-CREATE TABLE tblEdAppointment (
-  kEdAppointmentId integer PRIMARY KEY,
-  strName text,
-  dtmBegin timestamp,
-  dtmEnd timestamp
+CREATE TABLE appointment (
+  appointment_id SERIAL PRIMARY KEY ,
+  name text,
+  start_time timestamp,
+  end_time timestamp
 );
 
-ALTER TABLE tblEdAppointment
-  ADD FOREIGN KEY (kEdAppointmentId)
-  REFERENCES tblEdAppointmentSeries (kEdAppointmentId);
+ALTER TABLE appointment_series
+  ADD FOREIGN KEY (appointment_id)
+  REFERENCES appointment (appointment_id);
 
-ALTER TABLE tblExcludedFromSeries
-  ADD FOREIGN KEY (kEdAppointmentId)
-  REFERENCES tblEdAppointmentSeries (kEdAppointmentId);
+ALTER TABLE excluded_from_series
+  ADD FOREIGN KEY (appointment_id)
+  REFERENCES appointment (appointment_id);
 
-ALTER TABLE tblExcludedFromSeries
-  ADD FOREIGN KEY (kDecAppointmentId)
-  REFERENCES tblEdAppointment (kEdAppointmentId);
+ALTER TABLE excluded_from_series
+  ADD FOREIGN KEY (dec_appointment_id)
+  REFERENCES appointment (appointment_id);
