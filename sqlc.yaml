@@ -5,6 +5,6 @@ sql:
     schema: "schema.sql"
     gen:
       go:
-        package: "appointment-experiment"
-        out: "appointment-experiment"
+        package: "appointment_experiment"
+        out: "appointment_experiment"
         sql_package: "pgx/v5"

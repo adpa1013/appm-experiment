@@ -23,26 +23,34 @@ CREATE TYPE ScheduleType AS ENUM (
 CREATE TABLE tblEdAppointmentSeries (
   kEdAppointmentId integer PRIMARY KEY,
   eScheduleType ScheduleType NOT NULL,
-  dtmEnd datetime,
-  kDayWeekSchedule tinyint,
-  kMonthSchedule int,
-  kYearSchedule int,
+  dtmEnd timestamp,
+  kDayWeekSchedule smallint,
+  kMonthSchedule integer,
+  kYearSchedule integer,
   eMonthOfYear Month
 );
 
 CREATE TABLE tblExcludedFromSeries (
   kDecAppointmentId integer PRIMARY KEY,
   kEdAppointmentId integer NOT NULL,
-  dtmSrcSeriesApmt datetime
+  dtmSrcSeriesApmt timestamp
 );
 
 CREATE TABLE tblEdAppointment (
   kEdAppointmentId integer PRIMARY KEY,
-  strName string,
-  dtmBegin datetime,
-  dtmEnd datetime
+  strName text,
+  dtmBegin timestamp,
+  dtmEnd timestamp
 );
 
-ALTER TABLE tblEdAppointment ADD FOREIGN KEY (kEdAppointmentId) REFERENCES tblEdAppointmentSeries (kEdAppointmentId);
-ALTER TABLE tblExcludedFromSeries ADD FOREIGN KEY (kEdAppointmentId) REFERENCES tblEdAppointmentSeries (kEdAppointmentId);
-ALTER TABLE tblExcludedFromSeries ADD FOREIGN KEY (kDecAppointmentId) REFERENCES tblEdAppointment (kEdAppointmentId);
+ALTER TABLE tblEdAppointment
+  ADD FOREIGN KEY (kEdAppointmentId)
+  REFERENCES tblEdAppointmentSeries (kEdAppointmentId);
+
+ALTER TABLE tblExcludedFromSeries
+  ADD FOREIGN KEY (kEdAppointmentId)
+  REFERENCES tblEdAppointmentSeries (kEdAppointmentId);
+
+ALTER TABLE tblExcludedFromSeries
+  ADD FOREIGN KEY (kDecAppointmentId)
+  REFERENCES tblEdAppointment (kEdAppointmentId);
