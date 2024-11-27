@@ -11,6 +11,12 @@ import (
 	"github.com/jackc/pgx/v5/pgtype"
 )
 
+type BatchInsertAppointmentParams struct {
+	Name      pgtype.Text
+	StartTime pgtype.Timestamp
+	EndTime   pgtype.Timestamp
+}
+
 const deleteEverything = `-- name: DeleteEverything :exec
 
 DELETE FROM appointment
